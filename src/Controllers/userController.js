@@ -1,7 +1,9 @@
 const userSchema = require("../Models/userModal");
 
 const loginUser = async (req, res) => {
-  const { name, phoneNumber, email, age, username, password } = req.body;
+  const { firstName, lastName, phoneNumber, email, age, username, password } =
+    req.body;
+  const name = firstName + " " + lastName;
   const existingUser = await userSchema.findOne({ email });
   try {
     if (name && phoneNumber && email && age && username && password) {
@@ -23,4 +25,35 @@ const loginUser = async (req, res) => {
   }
 };
 
-module.exports = { loginUser };
+const signupUser = async (req, res) => {
+  const { firstName, lastName, phoneNumber, email, age, username, password } =
+    req.body;
+  const name = firstName + " " + lastName;
+  const existingUser = await userSchema.findOne({ email });
+  try {
+    if (name && phoneNumber && email && age && username && password) {
+      if (!existingUser) {
+        const saveUser = {
+          name,
+          phoneNumber,
+          email,
+          age,
+          username,
+          password,
+        };
+        await userSchema.create(saveUser);
+        res
+          .status(200)
+          .json({ status: 200, message: "Registration Successful" });
+      } else {
+        res.status(400).json({ status: 400, message: "User already exists" });
+      }
+    } else {
+      res.status(400).json({ status: 400, message: "All fields are required" });
+    }
+  } catch (error) {
+    res.status(400).json({ status: 401, error });
+  }
+};
+
+module.exports = { loginUser, signupUser };
